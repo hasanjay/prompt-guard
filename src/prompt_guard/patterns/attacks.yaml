@@ -1,0 +1,77 @@
+# قاعدة بيانات أنماط هجمات حقن الأوامر (Prompt Injection)
+# كل نمط له: id, الفئة (category), الوزن (weight 0-1), والتعبير النمطي (pattern).
+# الأوزان تعكس مدى قوة دلالة النمط على هجوم.
+# هذا الملف قابل للتوسعة من المجتمع عبر pull requests.
+
+patterns:
+  # ───────────── تجاهل/إلغاء التعليمات ─────────────
+  - id: ignore_previous
+    category: instruction_override
+    weight: 0.9
+    pattern: '(?i)\b(ignore|disregard|forget|override)\b.{0,30}\b(previous|prior|above|earlier|all)\b.{0,30}\b(instruction|prompt|rule|context|message)s?\b'
+    description: "محاولة إلغاء التعليمات السابقة"
+
+  - id: ignore_previous_ar
+    category: instruction_override
+    weight: 0.9
+    pattern: '(تجاهل|انس|الغِ|تجاوز).{0,30}(السابق|كل|جميع).{0,30}(التعليمات|الأوامر|التوجيهات)'
+    description: "محاولة إلغاء التعليمات السابقة (عربي)"
+
+  # ───────────── انتحال دور النظام ─────────────
+  - id: system_role_spoof
+    category: role_manipulation
+    weight: 0.85
+    pattern: '(?i)\b(you are now|act as|pretend to be|from now on you)\b.{0,40}\b(system|admin|developer|root|dan|jailbreak)\b'
+    description: "محاولة إعادة تعريف دور النموذج"
+
+  - id: fake_system_tag
+    category: role_manipulation
+    weight: 0.8
+    pattern: '(?i)(\[?system\]?\s*:|\<\|?system\|?\>|###\s*system)'
+    description: "حقن وسم نظام مزيّف"
+
+  # ───────────── كشف/تسريب تعليمات النظام ─────────────
+  - id: reveal_system_prompt
+    category: prompt_leak
+    weight: 0.8
+    pattern: '(?i)\b(reveal|show|print|repeat|output|tell me)\b.{0,30}\b(your |the )?(system |initial |original )?(prompt|instruction|rule|guideline)s?\b'
+    description: "محاولة استخراج تعليمات النظام"
+
+  - id: reveal_system_prompt_ar
+    category: prompt_leak
+    weight: 0.8
+    pattern: '(اكشف|أظهر|اطبع|كرر|أخبرني).{0,30}(تعليمات|توجيهات|أوامر).{0,20}(النظام|الأصلية)'
+    description: "محاولة استخراج تعليمات النظام (عربي)"
+
+  # ───────────── تجاوز الحماية (Jailbreak) ─────────────
+  - id: jailbreak_keywords
+    category: jailbreak
+    weight: 0.75
+    pattern: '(?i)\b(jailbreak|dan mode|developer mode|do anything now|unfiltered|no restrictions|without any rules)\b'
+    description: "عبارات تجاوز حماية معروفة"
+
+  - id: hypothetical_bypass
+    category: jailbreak
+    weight: 0.55
+    pattern: '(?i)\b(hypothetically|in a fictional|imagine you|for educational purposes only)\b.{0,40}\b(no rules|ignore|bypass|anything)\b'
+    description: "تجاوز عبر تأطير افتراضي/خيالي"
+
+  # ───────────── حقن المحدِّدات والترميز ─────────────
+  - id: delimiter_injection
+    category: delimiter_attack
+    weight: 0.6
+    pattern: '(?i)(---+\s*end\s*---+|"""\s*system|```\s*system|<\/?(instructions?|context)>)'
+    description: "حقن محدِّدات لكسر بنية السياق"
+
+  - id: encoding_evasion
+    category: evasion
+    weight: 0.5
+    pattern: '(?i)\b(base64|rot13|reverse the|decode the following|in leetspeak)\b'
+    description: "محاولة تهرّب عبر الترميز"
+
+  # ───────────── تسريب البيانات ─────────────
+  - id: data_exfil
+    category: data_exfiltration
+    weight: 0.7
+    pattern: '(?i)\b(send|exfiltrate|leak|forward|email|post)\b.{0,30}\b(secret|password|api[\s_-]?key|credential|token|private)\b'
+    description: "محاولة تسريب بيانات حساسة"

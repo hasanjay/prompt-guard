@@ -1,0 +1,46 @@
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[project]
+name = "prompt-guard"
+version = "0.4.0"
+description = "دفاع متعدد الطبقات ضد هجمات حقن الأوامر في النماذج اللغوية الكبيرة"
+readme = "README.md"
+requires-python = ">=3.9"
+license = { text = "MIT" }
+authors = [
+    { name = "Hasan Jameel Azooz" },
+]
+keywords = [
+    "llm", "security", "prompt-injection", "ai-safety",
+    "llm-safety", "jailbreak-detection",
+]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: Developers",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Topic :: Security",
+]
+dependencies = [
+    "pyyaml>=6.0",
+    "scikit-learn>=1.0",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=7.0",
+    "pytest-cov>=4.0",
+]
+
+[project.urls]
+Homepage = "https://github.com/hasanazooz/prompt-guard"
+Repository = "https://github.com/hasanazooz/prompt-guard"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/prompt_guard"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+pythonpath = ["src"]
